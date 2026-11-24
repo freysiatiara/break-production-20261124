@@ -45,6 +45,13 @@ def main():
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(LINE + "\n")
     os.chmod(path, 0o644)
+    # Round-trip verification: re-read what was written and confirm it is
+    # byte-for-byte the entry line, so a silent partial write or a
+    # filesystem error can never pass as a successful run.
+    with open(path, "r", encoding="utf-8", newline="") as f:
+        written = f.read()
+    if written != LINE + "\n":
+        raise ValueError("round-trip verification failed: written file does not match entry line")
 
 
 if __name__ == "__main__":
